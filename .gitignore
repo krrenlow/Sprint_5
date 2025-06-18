@@ -1,0 +1,52 @@
+# Системные файлы Windows
+/[Aa]pplication [Dd]ata/
+/[Cc]ookies/
+/[Ll]ocal [Ss]ettings/
+/[Mm]y [Dd]ocuments/
+/[Nn]et[Hh]ood/
+/[Pp]rint[Hh]ood/
+/[Rr]ecent/
+/[Ss]end[Tt]o/
+/[Ss]tart [Mm]enu/
+/[Tt]emplates/
+NTUSER.*
+*.dat
+*.ini
+*.log
+Thumbs.db
+
+# Пользовательские директории
+/.android/
+/.cache/
+/.jdks/
+/.ssh/
+/AppData/
+/Contacts/
+/Desktop/
+/Documents/
+/Downloads/
+/Favorites/
+/Links/
+/Music/
+/Pictures/
+/Saved Games/
+/Searches/
+/Videos/
+/OneDrive/
+
+# Файлы конфигурации
+.bash_history
+.gitconfig
+.idlerc/
+.lesshst
+.lim/
+.limpc/
+.viminfo
+.wdc/
+.zshrc
+PaceKeyChain
+battery-report.html
+
+# Проекты вне этого репозитория
+../*
+!../Sprint_5/
