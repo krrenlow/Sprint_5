@@ -1,52 +1,98 @@
 # Системные файлы Windows
-/[Aa]pplication [Dd]ata/
-/[Cc]ookies/
-/[Ll]ocal [Ss]ettings/
-/[Mm]y [Dd]ocuments/
-/[Nn]et[Hh]ood/
-/[Pp]rint[Hh]ood/
-/[Rr]ecent/
-/[Ss]end[Tt]o/
-/[Ss]tart [Mm]enu/
-/[Tt]emplates/
-NTUSER.*
-*.dat
-*.ini
+NTUSER.DAT*
+ntuser.*
+*.regtrans-ms
+*.blf
 *.log
-Thumbs.db
+*.tmp
+*.temp
+*.etl
+*.evtx
+*.evt
+*.chk
+*.old
+*.bak
+*.sav
+*.pid
+*.ilk
+*.pdb
 
-# Пользовательские директории
-/.android/
-/.cache/
-/.jdks/
-/.ssh/
-/AppData/
-/Contacts/
-/Desktop/
-/Documents/
-/Downloads/
-/Favorites/
-/Links/
-/Music/
-/Pictures/
-/Saved Games/
-/Searches/
-/Videos/
-/OneDrive/
-
-# Файлы конфигурации
+# Файлы пользователя
 .bash_history
-.gitconfig
-.idlerc/
+.viminfo
+.zshrc
 .lesshst
 .lim/
 .limpc/
-.viminfo
+.ssh/
+.android/
+.cache/
+.idlerc/
+.jdks/
 .wdc/
-.zshrc
-PaceKeyChain
+AppData/
+Contacts/
+Desktop/
+Documents/
+Favorites/
+Links/
+Music/
+OneDrive/
+Pictures/
+Saved Games/
+Searches/
+Videos/
 battery-report.html
+dev/
+ntuser.ini
+PaceKeyChain
 
-# Проекты вне этого репозитория
-../*
-!../Sprint_5/
+# Другие проекты
+IdeaProjects/
+PycharmProjects/YaPracticum/
+PycharmProjects/projectzero/
+PycharmProjects/pythonProject/
+PycharmProjects/qa_python3/
+PycharmProjects/qa_python_1/
+PycharmProjects/qa_python_2/
+PycharmProjects/qa_python_tasks-main/
+Sprint_4/
+
+
+
+# IDE (PyCharm)
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea/vcs.xml
+.idea/workspace.xml
+.idea/*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Временные файлы
+*.swp
+*.swo
+*~

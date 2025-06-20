@@ -1,48 +1,98 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from locators import Alllocarots
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.common.exceptions import StaleElementReferenceException
+from locators import AuthLocators, AdLocators
+from urls import URLs
+import time
 
 
 class TestCreateMessage:
+    def test_create_message_authorizate_user(self, driver, login_user):
+        """
+        Улучшенный тест создания объявления с авторизацией пользователя
+        """
+        wait = WebDriverWait(driver, 20)
 
-    def test_create_message_authorizate_user(self, login_user):
-        driver = login_user
+        try:
+            # 1. Клик на кнопку "Разместить объявление" с обработкой исключений
+            self._safe_click(wait, AdLocators.CREATE_AD_BTN)
 
-        # Клик на кнопку Разместить объявление
-        driver.find_element(*Alllocarots.BUTTON_CREATE_MESSAGE).click()
-        # Заполняем поле "Название"
-        driver.find_element(*Alllocarots.NAME_MESSAGE).send_keys("Приключения")
-        WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element_value(Alllocarots.NAME_MESSAGE, "Приключения"))
-        # Ожидание, что поле дропдаун категории кликабельно
-        WebDriverWait(driver, 20).until(EC.element_to_be_clickable((Alllocarots.DROP_DOUN_CATEGORY_BUTTON)))
-        # Клик на дропдаун категории
-        driver.find_element(*Alllocarots.DROP_DOUN_CATEGORY).click()
-        # Ожидание появления выпадающего списка категорий
-        WebDriverWait(driver, 20).until(EC.element_to_be_clickable((Alllocarots.LIST_CATEGORY)))
-        # Выбор категории книги
-        driver.find_element(*Alllocarots.CATEGORY_BOOKS).click()
-        # Переключение на состояние товара Б/У
-        driver.find_element(*Alllocarots.B_U).click()
-        # Клик на дропдаун города
-        driver.find_element(*Alllocarots.CITY_DROP_DOUN).click()
-        # Ожидание появления списка городов
-        WebDriverWait(driver, 20).until(EC.element_to_be_clickable((Alllocarots.LIST_CITY)))
-        # Клик на город Санкт-Петербург
-        driver.find_element(*Alllocarots.CYTI_NAME).click()
-        # Ввод описания
-        driver.find_element(*Alllocarots.DISCRIPTION).send_keys("Приключения")
-        # Клик на ввод стоимости
-        driver.find_element(*Alllocarots.PRICE).send_keys(56)
-        # Ожидание появляение кнопки Опубликовать
-        WebDriverWait(driver, 20).until(EC.element_to_be_clickable((Alllocarots.BUTTON_PUBLISH)))
-        # Клик на кнопку Опубликовать
-        driver.find_element(*Alllocarots.BUTTON_PUBLISH).click()
-        # Переход в профиль
-        driver.find_element(*Alllocarots.ENTER_TO_PROFILE).click()
-        # Ожидание что страница профиля подгрузилась
-        WebDriverWait(driver, 10).until(EC.url_to_be("https://qa-desk.stand.praktikum-services.ru/profile"))
-        driver.get("https://qa-desk.stand.praktikum-services.ru/profile")
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((Alllocarots.MESSAGE_PUBLISH_BOOK)))
-        assert driver.find_element(*Alllocarots.MESSAGE_PUBLISH_BOOK).is_displayed()
+            # 2. Проверка формы создания объявления
+            wait.until(EC.visibility_of_element_located(AdLocators.NEW_AD_HEADER))
+
+            # 3. Заполнение данных объявления
+            ad_title = "Приключения"
+            self._safe_send_keys(wait, AdLocators.AD_NAME_INPUT, ad_title)
+            wait.until(EC.text_to_be_present_in_element_value(AdLocators.AD_NAME_INPUT, ad_title))
+
+            # 4. Выбор категории
+            self._safe_click(wait, AdLocators.CATEGORY_DROPDOWN)
+            self._safe_click(wait, AdLocators.BOOKS_CATEGORY)
+
+            # 5. Установка состояния товара
+            self._safe_click(wait, AdLocators.USED_CONDITION)
+
+            # 6. Выбор города
+            self._safe_click(wait, AdLocators.CITY_DROPDOWN)
+            self._safe_click(wait, AdLocators.SPB_CITY)
+
+            # 7. Заполнение остальных полей
+            self._safe_send_keys(wait, AdLocators.DESCRIPTION_INPUT, "Книга в отличном состоянии")
+            self._safe_send_keys(wait, AdLocators.PRICE_INPUT, "560")
+
+            # 8. Публикация объявления
+            self._safe_click(wait, AdLocators.PUBLISH_BTN)
+
+            # 9. Переход в профиль с обработкой StaleElement
+            self._safe_click_with_retry(wait, AuthLocators.AVATAR_ICON, retries=3, delay=1)
+
+            # 10. Проверка объявления в профиле
+            wait.until(lambda d: URLs.PROFILE_URL in d.current_url)
+            published_ad = self._wait_for_stable_element(wait, AdLocators.PUBLISHED_AD)
+            assert ad_title in published_ad.text, "Название объявления не соответствует ожидаемому"
+
+        except Exception as e:
+            driver.save_screenshot("test_failure.png")
+            raise
+
+    def _safe_click(self, wait, locator):
+        """Безопасный клик с обработкой исключений"""
+        try:
+            element = wait.until(EC.element_to_be_clickable(locator))
+            element.click()
+        except StaleElementReferenceException:
+            # Если элемент устарел, находим его заново
+            element = wait.until(EC.element_to_be_clickable(locator))
+            element.click()
+
+    def _safe_send_keys(self, wait, locator, text):
+        """Безопасный ввод текста"""
+        element = wait.until(EC.visibility_of_element_located(locator))
+        element.clear()
+        element.send_keys(text)
+
+    def _safe_click_with_retry(self, wait, locator, retries=3, delay=1):
+        """Клик с повторными попытками"""
+        for attempt in range(retries):
+            try:
+                element = wait.until(EC.element_to_be_clickable(locator))
+                element.click()
+                return
+            except Exception as e:
+                if attempt == retries - 1:
+                    raise
+                time.sleep(delay)
+                continue
+
+    def _wait_for_stable_element(self, wait, locator, attempts=3, delay=1):
+        """Ожидание стабильного элемента"""
+        for _ in range(attempts):
+            try:
+                element = wait.until(EC.visibility_of_element_located(locator))
+                # Дополнительная проверка, что элемент не меняется
+                time.sleep(delay)
+                if element.is_displayed():
+                    return element
+            except StaleElementReferenceException:
+                continue
+        raise TimeoutError(f"Элемент {locator} не стабилизировался после {attempts} попыток")

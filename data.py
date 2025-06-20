@@ -1,7 +1,9 @@
+class TestData:
+    EMAIL = "kr.ren.low@gmail.com"
+    PASSWORD = "5555"
 
 class Config:
-    PASSWORD = 558852
-    ACCOUNT = "kr.ren.low@gmail.com"
-    PASSWORD_ACCOUNT = 5555
-    ACCOUNT_TWOO = "kr.ren.low@gmail.com"
-    PASSWORD_ACCOUNT_TWO = 5555
+    DEFAULT_PASSWORD = "55551"
+    ACCOUNT_EMAIL = TestData.EMAIL
+    ACCOUNT_PASSWORD = TestData.PASSWORD
+    DEFAULT_TIMEOUT = 10

@@ -1,22 +1,37 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from locators import Alllocarots
+from locators import AdLocators
 import pytest
 
 
+class TestCreateAdUnauthorized:
+    def test_create_ad_unauthorized(self, driver):
 
-class TestCreateMessageUnauthorized:
+        try:
+            # 1. Клик по кнопке создания объявления
+            create_ad_btn = WebDriverWait(driver, 15).until(
+                EC.element_to_be_clickable(AdLocators.CREATE_AD_BTN)
+            )
+            # Прокрутка к элементу перед кликом (если нужно)
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", create_ad_btn)
+            create_ad_btn.click()
 
-    def test_create_message_unauthorized(self,driver):
-        # Ждем появления кнопки Разместить объявление
-        WebDriverWait(driver, 10).until(EC.visibility_of_element_located(Alllocarots.BUTTON_CREATE_MESSAGE))
-        # Клик по кнопке Разместить объявление
-        driver.find_element(*Alllocarots.BUTTON_CREATE_MESSAGE).click()
-        # Ждем появление поп-апа "Чтобы разместить объявление, авторизуйтесь"
-        WebDriverWait(driver, 10).until(EC.visibility_of_element_located(Alllocarots.BUTTON_CREATE_MESSAGE))
-        # Получение попа-апа и текста в нем
-        message_need_authoriate = driver.find_element(*Alllocarots.POPUP_MESSAGE_AUTHORIZATE).text
+            # 2. Ожидание появления попапа с требованием авторизации
+            auth_popup = WebDriverWait(driver, 15).until(
+                EC.visibility_of_element_located(AdLocators.AUTH_REQUIRED_POPUP)
+            )
 
-        assert  message_need_authoriate == 'Чтобы разместить объявление, авторизуйтесь'
+            # 3. Проверка текста сообщения
+            popup_text = auth_popup.text.strip()
+            expected_text = 'Чтобы разместить объявление, авторизуйтесь'
+
+            assert popup_text == expected_text, \
+                f"Ожидаемый текст: '{expected_text}', Фактический: '{popup_text}'"
+
+        except TimeoutException as e:
+            driver.save_screenshot("create_ad_timeout_error.png")
+            pytest.fail(f"Тест завершился с таймаутом: {str(e)}")
+        except Exception as e:
+            driver.save_screenshot("create_ad_error.png")
+            pytest.fail(f"Неожиданная ошибка: {str(e)}")
