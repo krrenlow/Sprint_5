@@ -1,5 +1,7 @@
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+from data import Config
 from locators import AuthLocators
 from urls import URLs
 import pytest
@@ -15,8 +17,8 @@ class TestUserLogout:
         wait.until(EC.element_to_be_clickable(AuthLocators.ENTER_REGISTER_BTN)).click()
         wait.until(EC.visibility_of_element_located(AuthLocators.LOGIN_POPUP))
 
-        driver.find_element(*AuthLocators.LOGIN_EMAIL).send_keys("kr.ren.low@gmail.com")
-        driver.find_element(*AuthLocators.LOGIN_PASSWORD).send_keys("5555")
+        driver.find_element(*AuthLocators.LOGIN_EMAIL).send_keys(Config.ACCOUNT_EMAIL)
+        driver.find_element(*AuthLocators.LOGIN_PASSWORD).send_keys(Config.ACCOUNT_PASSWORD)
         driver.find_element(*AuthLocators.LOGIN_SUBMIT_BTN).click()
 
         # 2. Проверка успешной авторизации
